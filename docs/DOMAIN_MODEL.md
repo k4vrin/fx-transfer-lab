@@ -1,5 +1,7 @@
 # Business Model and Invariants
 
+[نسخه فارسی](DOMAIN_MODEL.fa.md)
+
 This document explains the fictional domain before implementation. Names may
 evolve, but an invariant should change only through a recorded design decision.
 

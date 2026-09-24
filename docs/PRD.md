@@ -1,5 +1,7 @@
 # FX Transfer Lab — Minimal Product Requirements
 
+[نسخه فارسی](PRD.fa.md)
+
 ## 1. Purpose
 
 FX Transfer Lab is a fictional backend in which one authenticated customer

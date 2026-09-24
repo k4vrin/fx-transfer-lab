@@ -47,8 +47,8 @@ No transfer endpoint or domain solution has been implemented. Follow
 
 ## Documentation
 
-- [Product requirements](docs/PRD.md)
-- [Business model and invariants](docs/DOMAIN_MODEL.md)
+- Product requirements: [English](docs/PRD.md) · [فارسی](docs/PRD.fa.md)
+- Business model and invariants: [English](docs/DOMAIN_MODEL.md) · [فارسی](docs/DOMAIN_MODEL.fa.md)
 - [Package responsibilities](docs/PACKAGE_GUIDE.md)
 - [Implementation roadmap](docs/ROADMAP.md)
 
