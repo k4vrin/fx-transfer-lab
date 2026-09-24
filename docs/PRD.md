@@ -67,6 +67,10 @@ These are lab choices, not universal banking rules:
 9. All C2 booking data is committed in one Oracle transaction.
 10. External settlement and message delivery are separate later concerns.
 
+The exact C0 choices for precision, quote use, expiry, idempotency, locking,
+authentication, reversal, and rate trust are normative in
+[C0 Design Decisions](DESIGN_DECISIONS.md).
+
 Any changed assumption must be captured in a short architecture decision record
 before code and tests are changed.
 
@@ -142,9 +146,9 @@ One possible fictional journal is:
 | EUR | Customer source 102.00 | FX clearing 100.00 + fee revenue 2.00 |
 | USD | FX clearing 110.00 | Customer destination 110.00 |
 
-The exact account-type sign rules must be written before implementation. The
-important invariant is balanced entries per currency and a customer balance
-effect consistent with those rules.
+The exact account-type sign rules are defined in
+[C0 Design Decisions](DESIGN_DECISIONS.md). The important invariant is balanced
+entries per currency and a customer balance effect consistent with those rules.
 
 ## 7. Non-functional requirements
 

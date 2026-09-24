@@ -4,6 +4,11 @@ This is a learning checklist, not a race. Check an item only after its stated
 evidence exists. Preserve your first independent attempt before asking for a
 worked solution.
 
+The twelve C0 choices are now resolved in
+[C0 Design Decisions](DESIGN_DECISIONS.md). Use the smaller, reviewable task IDs
+in [Implementation Tasks](IMPLEMENTATION_TASKS.md) for day-to-day coding. This
+roadmap remains the milestone-level view.
+
 ## Evidence legend
 
 - **Design:** a written decision or diagram; it is not executed behavior.
@@ -19,14 +24,14 @@ Target: understand the fictional business and make its assumptions explicit.
 - [ ] Read `README.md`, `docs/PRD.md`, and `docs/DOMAIN_MODEL.md`.
 - [ ] Rewrite the transfer flow in your own words without looking.
 - [ ] Draw the happy-path sequence from HTTP request through database commit.
-- [ ] Choose supported currencies, scale, and rounding mode.
-- [ ] Define debit/credit balance effects for customer, clearing, and fee
+- [x] Choose supported currencies, scale, and rounding mode.
+- [x] Define debit/credit balance effects for customer, clearing, and fee
       accounts.
-- [ ] Decide the exact quote-expiry boundary.
-- [ ] Define the normalized idempotency fingerprint.
-- [ ] Write the HTTP status/error-code matrix.
-- [ ] Define initial transfer and message-delivery states separately.
-- [ ] Add `docs/adr/0001-modular-monolith.md` in your own words.
+- [x] Decide the exact quote-expiry boundary.
+- [x] Define the normalized idempotency fingerprint.
+- [x] Write the HTTP status/error-code matrix.
+- [x] Define initial transfer and message-delivery states separately.
+- [ ] Add `docs/adr/0001-start-as-a-modular-monolith.md` in your own words.
 - [ ] Explain why one application and one database are enough for C1-C3.
 
 Exit evidence:

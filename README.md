@@ -30,7 +30,8 @@ milestones.
 - [x] Java 21 toolchain recorded.
 - [x] Oracle development and test environments described.
 - [x] Product, domain, package, and learning documents created.
-- [ ] C0 assumptions and design decisions completed by the learner.
+- [x] C0 assumptions and design decisions recorded.
+- [ ] Learner C0 restatement, diagram, and ADR completed.
 - [ ] Business behavior implemented.
 
 No transfer endpoint or domain solution has been implemented. Follow
@@ -49,8 +50,10 @@ No transfer endpoint or domain solution has been implemented. Follow
 
 - Product requirements: [English](docs/PRD.md) · [فارسی](docs/PRD.fa.md)
 - Business model and invariants: [English](docs/DOMAIN_MODEL.md) · [فارسی](docs/DOMAIN_MODEL.fa.md)
+- C0 design decisions: [English](docs/DESIGN_DECISIONS.md) · [فارسی](docs/DESIGN_DECISIONS.fa.md)
 - [Package responsibilities](docs/PACKAGE_GUIDE.md)
 - [Implementation roadmap](docs/ROADMAP.md)
+- [Detailed implementation tasks](docs/IMPLEMENTATION_TASKS.md)
 
 Read the PRD and domain model before creating domain classes. The documentation
 defines a deliberately small fictional model so that no banking background is

@@ -161,13 +161,11 @@ PENDING -> RETRYABLE_FAILURE -> PENDING
 Do not add states merely because a real bank might have them. Add a state only
 when the lab has behavior, an allowed transition, and a test for it.
 
-## Questions you must answer during C0
+## Resolved C0 decisions
 
-- What are the supported currency scales and rounding mode?
-- Does quote expiry use `isAfter`, `isBefore`, or an inclusive boundary at the
-  exact expiry instant?
-- What normalized fields form the idempotency fingerprint?
-- What account types exist, and how does debit/credit affect each balance?
-- Which row or rows are locked during booking, and in what order?
-- What HTTP result represents an expired quote, insufficient funds, ownership
-  failure, same-key/different-payload conflict, and an unknown transfer?
+The open modeling questions are resolved in
+[C0 Design Decisions](DESIGN_DECISIONS.md). That record is normative for account
+signs, ledger truth versus stored balances, precision and rounding, quote use and
+expiry, idempotency, locking, HTTP errors, reversal, authentication, and rate
+trust. Change one of those assumptions through an ADR rather than silently
+changing code.
