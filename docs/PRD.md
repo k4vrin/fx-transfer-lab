@@ -1,16 +1,17 @@
-# FX Transfer Lab — Minimal Product Requirements
+# FX Transfer Lab — Foundation Product Requirements
 
 [نسخه فارسی](PRD.fa.md)
 
 ## 1. Purpose
 
-FX Transfer Lab is a fictional backend in which one authenticated customer
-moves value from an internal source account to an internal destination account
-held in a different currency.
+FX Transfer Lab is a reference backend in which one authenticated customer moves
+value from an internal source account to an internal destination account held
+in a different currency.
 
-The product exists to practice precise domain modeling, REST contracts, local
-transactions, idempotency, concurrency, double-entry bookkeeping, and reliable
-message handoff. It does not reproduce any employer's system.
+The foundation demonstrates precise domain modeling, REST contracts, local
+transactions, idempotency, concurrency-safe booking, double-entry accounting
+evidence, and reliable message handoff. It is independent and does not reproduce
+or claim equivalence with any vendor or bank system.
 
 ## 2. The business problem in plain language
 
@@ -28,9 +29,9 @@ not a newer rate. It must take the source amount and fee only once, even if the
 client retries after a timeout. It must also leave an auditable journal showing
 where every amount went.
 
-This lab models an **internal book transfer**. Both customer accounts and the
-fictional clearing accounts are maintained in the same database. Moving money
-to another bank, settling with a real counterparty, sanctions screening,
+The foundation models an **internal book transfer**. Both customer accounts and
+the synthetic clearing accounts are maintained in the same database. Moving
+money to another bank, settling with a real counterparty, sanctions screening,
 liquidity management, market execution, and regulatory reporting are outside
 the model.
 
@@ -44,17 +45,17 @@ the model.
 - **Quote policy:** creates an immutable, expiring rate snapshot.
 - **Fee policy:** calculates a fee in the source currency.
 - **Ledger:** records balanced debit and credit entries for auditability.
-- **Outbox relay:** introduced later; forwards a committed message to a fake
+- **Outbox relay:** introduced later; forwards a committed message to a simulated
   gateway without making the database transaction depend on the network.
 
 ## 4. Initial assumptions
 
-These are lab choices, not universal banking rules:
+These are foundation-release choices, not universal banking rules:
 
 1. The authenticated customer owns both accounts.
 2. Source and destination currencies must differ.
-3. The first supported pair is EUR to USD; support for more pairs is an
-   extension, not a C1 requirement.
+3. The first supported pair is EUR to USD; support for more pairs belongs to a
+   later product phase.
 4. The fee is charged **on top of** the source amount and is denominated in the
    source currency.
 5. A quote is immutable and has an explicit expiry instant.
@@ -64,12 +65,12 @@ These are lab choices, not universal banking rules:
    rounding mode. Binary floating-point is forbidden.
 8. A booked transfer is never edited or deleted. A later correction is a new,
    linked reversal with compensating journal entries.
-9. All C2 booking data is committed in one Oracle transaction.
+9. All foundation booking data is committed in one Oracle transaction.
 10. External settlement and message delivery are separate later concerns.
 
-The exact C0 choices for precision, quote use, expiry, idempotency, locking,
-authentication, reversal, and rate trust are normative in
-[C0 Design Decisions](DESIGN_DECISIONS.md).
+The exact foundation choices for precision, quote use, expiry, idempotency,
+locking, authentication, reversal, and rate trust are normative in
+[Foundation Design Decisions](DESIGN_DECISIONS.md).
 
 Any changed assumption must be captured in a short architecture decision record
 before code and tests are changed.
@@ -126,8 +127,8 @@ transfers using a bounded page size and stable ordering.
 
 ### FR-9 — Hand off a message reliably
 
-In C3, an outbox row is committed with the transfer. Network publication occurs
-afterward and may be retried or duplicated. The booking transaction must not
+An outbox row is committed with the transfer. Network publication occurs
+afterward and may be retried or duplicated. The booking transaction does not
 depend on direct network success.
 
 ## 6. Example booking
@@ -147,19 +148,20 @@ One possible fictional journal is:
 | USD | FX clearing 110.00 | Customer destination 110.00 |
 
 The exact account-type sign rules are defined in
-[C0 Design Decisions](DESIGN_DECISIONS.md). The important invariant is balanced
-entries per currency and a customer balance effect consistent with those rules.
+[Foundation Design Decisions](DESIGN_DECISIONS.md). The important invariant is
+balanced entries per currency and a customer balance effect consistent with
+those rules.
 
 ## 7. Non-functional requirements
 
 - Use Java 21 and the Maven Wrapper.
-- Use one Spring Boot process and one Oracle database through C3.
+- Use one Spring Boot process and one Oracle database for the foundation.
 - Keep controllers thin and do not expose persistence entities as API models.
 - Store timestamps as instants and evaluate expiry using an injectable clock.
 - Do not log credentials, tokens, full sensitive payloads, or secrets.
 - Database schema changes must be versioned Flyway migrations.
-- Integration evidence must name the real database used; H2 evidence cannot
-  establish Oracle locking or query-plan behavior.
+- Integration tests for locking, constraints, and plans run against Oracle;
+  H2 results do not establish Oracle behavior.
 
 ## 8. Out of scope
 
@@ -172,9 +174,9 @@ entries per currency and a customer balance effect consistent with those rules.
 - Multi-region availability and production deployment
 - A frontend or mobile application
 
-## 9. Minimum useful result
+## 9. Foundation release
 
-C2 is the minimum useful stopping point: a database-backed, idempotent transfer
-with ownership checks, concurrency protection, and balanced per-currency
-journal entries. Later milestones add failure delivery, diagnostics, and oral
-defense; they do not repair missing C2 correctness.
+The first useful release is a database-backed, idempotent transfer with
+ownership checks, concurrency protection, balanced per-currency journal entries,
+reconciliation, and a transactional outbox. Later roadmap phases expand product
+scope; they do not compensate for missing foundation correctness.

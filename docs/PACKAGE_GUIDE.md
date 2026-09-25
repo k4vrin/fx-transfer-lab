@@ -76,9 +76,9 @@ It does not authenticate callers or choose a quote.
 
 ## `outbox`
 
-Introduced in C3. Owns durable outbound messages, relay selection, retry state,
-and the fake gateway adapter. It must preserve the distinction between a booked
-transfer and a delivered notification.
+Introduced after foundation booking. Owns durable outbound messages, relay
+selection, retry state, and simulated gateway adapters. It must preserve the
+distinction between a booked transfer and a delivered notification.
 
 ## `shared`
 

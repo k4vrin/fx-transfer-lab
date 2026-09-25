@@ -1,16 +1,10 @@
-# C0 Design Decisions
+# Foundation Design Decisions
 
 [نسخه فارسی](DESIGN_DECISIONS.fa.md)
 
-These decisions close the twelve open C0 questions for the first useful version
-of FX Transfer Lab. They are project assumptions, not claims about Exir, SWIFT,
-central-bank rules, or a particular core-banking product.
-
-The supplied job description influenced the evidence we want from the project:
-Core Java precision and concurrency, Spring/Hibernate transactions, Oracle
-constraints and plans, REST and SOAP boundaries, OAuth2/JWT authorization, and
-distributed-failure reasoning. It did not expand the product into a real
-cross-border payment system.
+These decisions define the first useful version of FX Transfer Lab. They are
+project assumptions, not claims about Exir, SWIFT, central-bank rules, or a
+particular core-banking product.
 
 ## Decision summary
 
@@ -18,14 +12,14 @@ cross-border payment system.
 | ---: | --- | --- |
 | 1 | How do debits and credits affect balances? | Use explicit account types and sign rules; never infer the effect from a name. |
 | 2 | Is balance derived or stored? | The immutable ledger is authoritative; a stored booked balance is a synchronous, reconcilable projection. |
-| 3 | What are scale and rounding rules? | C1-C2 support EUR and USD at scale 2; rates use scale 8; monetary rounding is `HALF_EVEN`. |
+| 3 | What are scale and rounding rules? | The foundation supports EUR and USD at scale 2; rates use scale 8; monetary rounding is `HALF_EVEN`. |
 | 4 | Can a quote fund multiple transfers? | No. A quote is single-use after one successful booking. |
 | 5 | Is the exact expiry instant valid? | No. A quote is valid only while `now < expiresAt`. |
 | 6 | What forms the idempotency fingerprint? | A versioned canonical representation of quote and account IDs, hashed with SHA-256. |
-| 7 | Are deterministic failures cached? | No. C2 commits only successful outcomes; a rolled-back failure may be retried. |
+| 7 | Are deterministic failures cached? | No. The foundation commits only successful outcomes; a rolled-back failure may be retried. |
 | 8 | What is locked, and in what order? | Reserve the idempotency key, lock the quote, then lock every affected account in ascending account-ID order. |
 | 9 | What are the HTTP statuses and error codes? | Use Problem Details plus stable project codes; the matrix below is normative. |
-| 10 | How do reversals work? | Not in C2. Later: full amount only, at most once, with linked compensating entries and its own idempotency key. |
+| 10 | How do reversals work? | Not in the foundation release. Later: full amount only, at most once, with linked compensating entries and its own idempotency key. |
 | 11 | What is the initial authentication mechanism? | OAuth2 Resource Server with JWT access tokens; object ownership remains an application rule. |
 | 12 | Where do exchange rates come from? | A trusted internal `RateProvider` port backed initially by deterministic fixtures, never by client input. |
 
@@ -49,8 +43,8 @@ For a EUR 100.00 to USD 110.00 transfer with a EUR 2.00 fee, the journal is:
 
 Each currency balances independently. The exchange rate relates the two currency
 groups but does not make EUR and USD arithmetically interchangeable. Internal
-clearing balances are seeded synthetic inventory; this lab does not model market
-execution, liquidity, or external settlement.
+clearing balances are seeded synthetic inventory; the foundation does not model
+market execution, liquidity, or external settlement.
 
 ## 2. Ledger truth and stored balances
 
@@ -61,11 +55,11 @@ That column is a synchronous projection, not a second independent truth.
 The same Oracle transaction must insert the journal and update all affected
 booked balances. A reconciliation query must be able to recompute each balance
 from its opening balance and journal entries. Asynchronous balance projection is
-out of scope through C3.
+out of scope for the foundation release.
 
 ## 3. Currency precision and rounding
 
-- C1-C2 support only EUR and USD; each amount has scale 2.
+- The foundation supports only EUR and USD; each amount has scale 2.
 - An exchange rate has scale 8 and explicit source/destination direction.
 - Use `BigDecimal` and `RoundingMode.HALF_EVEN`; never use `double` or `float`.
 - Normalize money at construction and reject a value that cannot be represented
@@ -75,8 +69,8 @@ out of scope through C3.
 - Calculate a percentage fee from the unrounded multiplication, then round once
   to the source scale. Do not round intermediate operands.
 
-This is a deliberately small lab currency catalog. Supporting currencies with
-different minor units requires a catalog change and changed-case tests.
+This is a deliberately small foundation currency catalog. Supporting currencies
+with different minor units requires a catalog change and changed-case tests.
 
 ## 4. Quote consumption
 
@@ -113,8 +107,8 @@ and operation are in the database key scope, not duplicated in the fingerprint.
 
 ## 7. Failure caching
 
-C2 does not cache business failures. Insufficient funds can change, and a
-validation failure creates no financial effect. The idempotency reservation is
+The foundation does not cache business failures. Insufficient funds can change,
+and a validation failure creates no financial effect. The idempotency reservation is
 inserted inside the booking transaction, so it rolls back with a failed booking
 and the client may retry.
 
@@ -123,7 +117,7 @@ original successful HTTP status and response snapshot. A concurrent duplicate
 contends on the unique index. After the first transaction commits, the loser
 reloads and either replays the successful result or reports a changed-payload
 conflict. If the first transaction rolls back, the waiting request may proceed.
-This avoids a stranded, committed `IN_PROGRESS` record in C2. Bounded lock
+This avoids a stranded, committed `IN_PROGRESS` record. Bounded lock
 timeouts remain infrastructure failures, not cached business outcomes.
 
 ## 8. Transaction and lock order
@@ -143,7 +137,7 @@ Within one `@Transactional` application use case:
 The deterministic account order reduces deadlock risk. Database unique
 constraints on idempotency scope and quote use close races that application
 checks alone cannot close. The shared clearing rows may become hot under load;
-that is an intentional discussion point, not a reason to split services in C2.
+that is a known foundation trade-off, not by itself a reason to split services.
 
 ## 9. HTTP and stable error contract
 
@@ -174,7 +168,8 @@ money snapshot.
 
 ## 10. Reversal contract
 
-Reversal is intentionally absent from C2. When added, it has these rules:
+Reversal is intentionally absent from the foundation release. When added, it has
+these rules:
 
 - only a `BOOKED` transfer may be reversed;
 - reversal is full, never partial, and uses the original amounts, currencies,
@@ -191,12 +186,12 @@ not pretend that an already sent message never existed.
 ## 11. Authentication and authorization
 
 Use Spring Security as an OAuth2 Resource Server that accepts JWT **access
-tokens**. The lab does not implement an authorization server. Local tests use
+tokens**. The project does not implement an authorization server. Local tests use
 test-signed or mocked JWTs with no real secrets committed.
 
 Validate signature/key trust, issuer, audience, expiry/not-before, and the
-required `fx-transfer:read` or `fx-transfer:write` scope. In the lab, JWT `sub`
-is the stable customer UUID. A valid token proves neither account ownership nor
+required `fx-transfer:read` or `fx-transfer:write` scope. In the foundation, JWT
+`sub` is the stable customer UUID. A valid token proves neither account ownership nor
 permission to operate on an arbitrary resource: the application service must
 load the account and compare its owner to the authenticated customer.
 
@@ -207,20 +202,20 @@ deterministic, operator-controlled fixture or database table. A quote stores the
 provider rate ID/version, direction, rate, `asOf`, and expiry. The client never
 submits or overrides the rate used for booking.
 
-An optional later SOAP adapter may call a fake rate service through the same
-port to practice the job description's REST/SOAP requirement. It must add
-authentication, timeout, freshness, and failure mapping before it could be
+An optional later SOAP adapter may call a simulated rate service through the
+same port as an institutional integration example. It must add authentication,
+timeout, freshness, and failure mapping before it could be
 trusted, and it still proves no real market connectivity.
 
-## Job-description alignment
+## Planned core-banking boundary
 
-| Requested capability | Where this project produces evidence |
-| --- | --- |
-| Core Java, OOP, and patterns | Immutable money/quote types, fee Strategy and registry, explicit invariants |
-| Memory and multithreading | Coordinated concurrency test plus a separate JVM/runtime diagnosis task |
-| Spring Boot, Hibernate, transactions | One application boundary, rollback tests, locking, query-count observation |
-| Oracle SQL, indexes, plans, pooling | Real Oracle Testcontainers tests, constraints, plan comparison, pool experiment |
-| REST and SOAP | Normative REST contract; optional thin SOAP adapter to the same use case |
-| OAuth2 and JWT | Resource-server validation plus application-level ownership tests |
-| Distributed systems | Transactional outbox, duplicate delivery, retry, and crash-window reasoning |
-| Design critique | ADR, hot-row trade-off, failure timeline, and oral defense |
+These decisions apply while the foundation owns synthetic customer accounts and
+can book all financial effects in one Oracle transaction. The product roadmap
+later moves authoritative accounts, balances, reservations, and final postings
+to a separate core-banking system.
+
+That evolution does not remove account or ledger concepts. Account becomes an
+access and integration boundary; ledger becomes the FX subledger and the source
+of posting instructions and reconciliation evidence. The change requires a new
+ADR because it replaces one local atomic transaction with an idempotent
+reservation, posting, status-inquiry, and reconciliation workflow.

@@ -1,174 +1,238 @@
-# Implementation Roadmap
+# Enterprise FX and Trade-Finance Roadmap
 
-This is a learning checklist, not a race. Check an item only after its stated
-evidence exists. Preserve your first independent attempt before asking for a
-worked solution.
+This roadmap describes how FX Transfer Lab can evolve from one reliable internal
+FX transfer into an enterprise-shaped foreign-exchange and trade-finance
+platform. The direction is inspired by publicly described capabilities common
+to products such as Exir, but this project is independent and is not affiliated
+with, endorsed by, or a reproduction of any vendor product.
 
-The twelve C0 choices are now resolved in
-[C0 Design Decisions](DESIGN_DECISIONS.md). Use the smaller, reviewable task IDs
-in [Implementation Tasks](IMPLEMENTATION_TASKS.md) for day-to-day coding. This
-roadmap remains the milestone-level view.
+The roadmap has no delivery-date promise. A phase advances only when its
+correctness, security, operational, and migration gates are satisfied.
 
-## Evidence legend
+## Architectural direction
 
-- **Design:** a written decision or diagram; it is not executed behavior.
-- **Unit:** a fast test of domain behavior without Spring or Oracle.
-- **Integration:** an executed test against Oracle through Testcontainers.
-- **Runtime:** an observed running request, query, plan, or failure.
-- **Defense:** an unaided spoken explanation and changed-case answer.
+The foundation starts as a modular monolith with one Oracle database because a
+single local transaction is the clearest way to establish monetary, ledger,
+idempotency, and concurrency correctness.
 
-## C0 — Scope and design
-
-Target: understand the fictional business and make its assumptions explicit.
-
-- [ ] Read `README.md`, `docs/PRD.md`, and `docs/DOMAIN_MODEL.md`.
-- [ ] Rewrite the transfer flow in your own words without looking.
-- [ ] Draw the happy-path sequence from HTTP request through database commit.
-- [x] Choose supported currencies, scale, and rounding mode.
-- [x] Define debit/credit balance effects for customer, clearing, and fee
-      accounts.
-- [x] Decide the exact quote-expiry boundary.
-- [x] Define the normalized idempotency fingerprint.
-- [x] Write the HTTP status/error-code matrix.
-- [x] Define initial transfer and message-delivery states separately.
-- [ ] Add `docs/adr/0001-start-as-a-modular-monolith.md` in your own words.
-- [ ] Explain why one application and one database are enough for C1-C3.
-
-Exit evidence:
-
-- [ ] One-page design reviewed without unresolved invariant contradictions.
-- [ ] Five-minute oral explanation with no claim of real banking behavior.
-
-## C1 — Money, quotes, and fee policies
-
-Target: model immutable values and strategy selection before persistence.
-
-Preparation:
-
-- [ ] Complete the relevant R2/G functional-interface and policy first attempt.
-- [ ] Handwrite the public behavior of `Money`, `Quote`, and `FeePolicy`.
-- [ ] List invalid construction cases before writing implementation code.
-
-Implementation:
-
-- [ ] Implement `Money` with currency-safe arithmetic.
-- [ ] Implement an explicitly directed exchange rate.
-- [ ] Implement immutable quote creation and expiry using an injectable clock.
-- [ ] Implement one fixed fee policy.
-- [ ] Implement one percentage fee policy with explicit rounding.
-- [ ] Implement a policy registry that rejects missing and duplicate keys.
-
-Tests:
-
-- [ ] Reject currency mismatch and non-positive amounts.
-- [ ] Prove the chosen rounding boundary with awkward decimal inputs.
-- [ ] Test the exact quote-expiry instant.
-- [ ] Test missing and duplicate fee-policy keys.
-- [ ] Add one changed requirement without editing existing policy consumers.
-
-Exit evidence:
-
-- [ ] `./mvnw test` passes.
-- [ ] You can explain why `BigDecimal` alone does not make money safe.
-- [ ] You can defend Strategy here without calling every function a pattern.
-
-## C2 — Idempotent transfer and balanced journal
-
-Target: produce the minimum useful database-backed project.
-
-Design and schema:
-
-- [ ] Draw the local transaction boundary.
-- [ ] Design account, quote, transfer, idempotency, journal, and entry tables.
-- [ ] Write Flyway migrations with primary, foreign, check, and unique
-      constraints.
-- [ ] Identify which invariant is enforced by Java, Oracle, or both.
-- [ ] Choose and document the account-locking strategy.
-
-Application behavior:
-
-- [ ] Implement caller identity without trusting a customer ID from the body.
-- [ ] Implement `POST /fx-transfers` request and response DTOs.
-- [ ] Verify ownership of both customer accounts.
-- [ ] Verify quote match and expiry inside the use case.
-- [ ] Implement caller-scoped idempotency and request fingerprinting.
-- [ ] Book account effects and immutable per-currency journal entries.
-- [ ] Commit transfer, idempotency outcome, balance effects, and journal in one
-      transaction.
-- [ ] Implement `GET /fx-transfers/{id}` with ownership protection.
-- [ ] Map expected failures to stable API error codes.
-
-Oracle-backed tests:
-
-- [ ] Same key and same request returns the original result.
-- [ ] Same key and changed request returns a conflict.
-- [ ] Insufficient funds leaves no partial booking.
-- [ ] Ownership failure exposes no other customer's transfer.
-- [ ] Concurrent debits cannot produce a negative balance.
-- [ ] Concurrent duplicate keys produce one business effect.
-- [ ] Every committed journal balances independently per currency.
-- [ ] A forced failure rolls back every C2 artifact.
-
-Exit evidence:
-
-- [ ] `./mvnw verify` passes against Oracle Testcontainers.
-- [ ] Record the test command, database image, observed result, and one failure
-      you corrected.
-- [ ] Explain six C2 questions listed in the R2 capstone note without reading.
-
-Stop here if interview preparation time is limited.
-
-## C3 — Transactional outbox and delivery failure
-
-Target: separate database commitment from unreliable network delivery.
-
-- [ ] Add the outbox table through Flyway.
-- [ ] Insert the outbox row in the booking transaction.
-- [ ] Implement a relay and fake gateway outside that transaction.
-- [ ] Give every message a stable event and correlation ID.
-- [ ] Simulate failure before commit, after commit/before publish, and after
-      publish/before acknowledgement.
-- [ ] Test duplicate relay attempts.
-- [ ] Implement bounded retry state and an observable terminal failure.
-- [ ] Explain why the outbox does not create end-to-end exactly-once delivery.
-
-## C4 — Interfaces and measured diagnosis
-
-Target: add only the role-specific depth that produces measured evidence.
-
-- [ ] Implement bounded, stably sorted customer transfer listing.
-- [ ] Measure query count and diagnose one deliberate N+1 case.
-- [ ] Capture an Oracle execution plan before and after one justified index.
-- [ ] Measure connection-pool hold and wait time under controlled load.
-- [ ] Replace lab authentication with an OAuth2 resource-server boundary if it
-      remains useful to the R2 security exercise.
-- [ ] Optionally map one SOAP operation to the same application use case.
-- [ ] Keep protocol-specific errors outside the domain model.
-
-Record `not run` instead of inventing unavailable runtime evidence.
-
-## C5 — Oral defense
-
-- [ ] Give a ten-minute architecture walkthrough.
-- [ ] Trace one successful request and one failed concurrent request.
-- [ ] Explain the commit/publish crash window.
-- [ ] Handle a changed fee rule without redesigning the entire application.
-- [ ] Handle a changed requirement where the destination account belongs to an
-      external beneficiary.
-- [ ] Identify what would force a new service or consistency boundary.
-- [ ] Present an evidence table separating design, code, unit tests, Oracle
-      integration tests, runtime observation, and unimplemented ideas.
-
-## Per-task evidence log
-
-Copy this block below the task you complete or into a dated note:
+The intended long-term boundary is different:
 
 ```text
-Attempt:
-Expected result:
-Command/test:
-Observed result:
-Failure or correction:
-Changed-case retest:
-Evidence level: Design | Unit | Integration | Runtime | Defense
+Channels and bank operators
+            |
+   FX and trade-finance platform
+            |
+   +--------+---------+----------------+
+   |                  |                |
+Rate and pricing   Workflow       Product modules
+   |                  |                |
+   +----------- FX subledger ----------+
+                       |
+              Posting instructions
+                       |
+              Core-banking adapter
+                       |
+              Separate core banking
 ```
+
+In that target architecture, core banking owns authoritative customer accounts,
+balances, reservations, and final postings. This platform owns FX products,
+quotes, fees, workflow, immutable business history, its FX subledger, outbound
+posting instructions, and reconciliation state.
+
+Distribution is introduced only when a named ownership, deployment, security,
+availability, or scaling requirement justifies its consistency cost.
+
+## Phase 0 — Reliable internal FX foundation
+
+Deliver one complete EUR-to-USD internal book transfer:
+
+- immutable money, directed exchange rates, quotes, and fee policies;
+- authenticated ownership checks;
+- caller-scoped idempotency and single-use quotes;
+- atomic account effects and balanced entries per currency;
+- deterministic account locking and Oracle-backed concurrency tests;
+- transfer retrieval, stable errors, reconciliation, and auditability; and
+- transactional outbox preparation for external delivery.
+
+**Exit gate:** repeated and concurrent requests cannot duplicate a financial
+effect, overspend an account, or leave a partial journal. Stored balance and
+ledger reconciliation agree.
+
+## Phase 1 — Operationally complete FX transfer service
+
+Harden the foundation before expanding product scope:
+
+- full linked reversal with compensating entries;
+- transfer search and stable pagination;
+- rate limiting and abuse controls;
+- structured audit events and security-safe logging;
+- metrics for latency, errors, lock waits, pool saturation, outbox age, and
+  reconciliation differences;
+- bounded outbox retry, terminal failure handling, and operator recovery;
+- backup, restore, migration, and disaster-recovery exercises; and
+- measured Oracle indexes, execution plans, and connection-pool behavior.
+
+**Exit gate:** the service has recovery procedures, observable failure states,
+and evidence that schema migrations and rollback paths preserve financial data.
+
+## Phase 2 — Separate core-banking integration
+
+Move authoritative balances out of the FX platform without discarding account
+or ledger concepts:
+
+- define an anti-corruption layer for account lookup, funds reservation,
+  posting, release, reversal, and status inquiry;
+- add stable external customer, account, reservation, posting, and correlation
+  references;
+- replace local balance ownership with a simulated core-banking adapter;
+- introduce `RESERVATION_PENDING`, `FUNDS_RESERVED`, `POSTING_PENDING`,
+  `POSTED`, `REJECTED`, and `RECONCILIATION_REQUIRED` behavior where justified;
+- treat timeout as an unknown outcome and inquire before retrying;
+- make every external command idempotent; and
+- reconcile FX instructions and subledger records with authoritative core
+  postings.
+
+Start with an in-process simulated adapter, then a separately deployed synthetic core
+banking service. REST, SOAP, or messaging is an adapter decision; remote DTOs do
+not enter the FX domain.
+
+**Exit gate:** injected timeouts, duplicate replies, late replies, and service
+restarts cannot create a duplicate posting or falsely mark an unknown posting as
+successful.
+
+## Phase 3 — Multi-currency rate, pricing, and accounting configuration
+
+Generalize rules through controlled, effective-dated configuration:
+
+- ISO currency catalog with currency-specific minor units;
+- multiple rate books, markets, providers, and intraday versions;
+- stale-rate policy, spread, preferential rates, and negotiated deals;
+- configurable fixed, percentage, tiered, minimum, maximum, and waived fees;
+- versioned accounting-event types and posting templates;
+- typed debit/credit account-resolution and amount rules;
+- simulation and validation before activation; and
+- maker-checker approval, effective dates, immutable versions, and rollback.
+
+Existing transfers retain the exact rate, fee, and accounting-template versions
+that produced them. “Dynamic” configuration never means executing arbitrary,
+unreviewed code in a financial path.
+
+**Exit gate:** a configuration version can be simulated, approved, activated,
+used deterministically, audited, and retired without changing historical
+transactions.
+
+## Phase 4 — Remittance and FX dealing
+
+Add complete vertical products rather than empty feature packages:
+
+- outgoing and incoming currency remittances;
+- commercial remittance purpose and supporting-document workflow;
+- currency purchase and sale deals;
+- beneficiary, counterparty, correspondent, and nostro/vostro references;
+- settlement instructions, value dates, cut-off times, and business calendars;
+- amendments, cancellation, rejection, return, and investigation cases; and
+- exposure, position, settlement, and reconciliation views.
+
+Each product supplies its own state machine, permissions, fees, accounting
+events, messages, documents, failure recovery, and audit history while reusing
+shared monetary and workflow foundations.
+
+**Exit gate:** at least one outgoing and one incoming flow survive duplicate,
+out-of-order, timeout, rejection, and reconciliation scenarios end to end.
+
+## Phase 5 — Trade-finance product modules
+
+Introduce one independently useful product at a time:
+
+1. foreign-currency guarantees;
+2. documentary credits;
+3. documentary collections and bills;
+4. correspondent credit lines; and
+5. amendments, document presentation, discrepancies, expiry, and closure.
+
+The platform needs party roles, document storage and versioning, work queues,
+maker-checker approvals, limits, collateral references, event-driven fees,
+accounting events, and message generation. Product workflows must be versioned
+so a running case does not silently change when a new process definition is
+published.
+
+**Exit gate:** each module has a reviewed domain glossary, allowed transitions,
+authorization matrix, accounting map, message map, reconciliation path, and
+complete audit history.
+
+## Phase 6 — Financial messaging and institutional integration
+
+Build protocol-neutral business messages before protocol adapters:
+
+- canonical financial-message model with stable business correlation;
+- schema validation, duplicate detection, acknowledgements, rejections, and
+  repair queues;
+- contract-first SOAP adapters where required;
+- simulated inbound and outbound SWIFT and SEPAM adapters;
+- core banking, identity, document, notification, and reporting adapters; and
+- central-bank reporting exports with versioned schemas and submission status.
+
+Real network compatibility requires licensed specifications, counterparties,
+security infrastructure, certification, and end-to-end testing. A simulated
+adapter must never be presented as proof of SWIFT, SEPAM, or regulatory
+interoperability.
+
+**Exit gate:** contract tests and failure injection prove validation,
+correlation, retry, duplicate handling, operator repair, and reconciliation for
+each simulated adapter.
+
+## Phase 7 — Localization, governance, and production readiness
+
+Complete the cross-cutting platform capabilities:
+
+- multilingual labels, documents, messages, and operator interfaces;
+- Gregorian, Solar Hijri, and business-calendar presentation without replacing
+  authoritative instants;
+- fine-grained roles, separation of duties, privileged-operation approval, and
+  periodic access review;
+- retention, privacy, key management, secrets, tamper-evident audit, and
+  security operations;
+- verification of stated contracts and validation by qualified banking, legal,
+  accounting, security, and regulatory reviewers;
+- capacity tests, back pressure, high availability, disaster recovery, and
+  regional failure exercises; and
+- release controls, migration rehearsals, runbooks, service-level objectives,
+  and incident response.
+
+**Exit gate:** production or compliance claims require evidence from the target
+environment and the responsible qualified reviewers. Passing local tests is not
+regulatory validation.
+
+## Candidate bounded contexts
+
+The roadmap may eventually produce these boundaries. They begin as modules and
+become separately deployable only when justified:
+
+| Context | Owns |
+| --- | --- |
+| Party and access | Parties, operator roles, customer references, entitlements |
+| Reference data | Currencies, countries, branches, calendars, code lists |
+| Rate book | Providers, markets, rate versions, freshness and spreads |
+| Pricing | Fee definitions, waivers, tiers and calculated fee snapshots |
+| Remittance | Incoming/outgoing instructions and beneficiary workflow |
+| FX dealing | Quotes, negotiated deals, positions and value dates |
+| Trade finance | Credits, guarantees, collections, presentations and amendments |
+| Workflow | Cases, tasks, approvals, maker-checker and process versions |
+| Accounting | FX subledger, posting templates, instructions and reconciliation |
+| Messaging | Canonical messages, protocol adapters, acknowledgements and repair |
+| Reporting | Operational, accounting and simulated regulatory reports |
+| Audit | Immutable business and security audit history |
+
+## Permanent scope and claim boundaries
+
+- This repository begins as a reference implementation, not a bank product.
+- The first release owns synthetic accounts; the target platform delegates
+  authoritative balances to core banking.
+- The FX subledger remains even after balance ownership moves.
+- UCP support is a versioned product and legal-review concern, not a boolean
+  validation flag.
+- Verification proves conformance to a stated contract; it does not by itself
+  validate suitability for regulated banking use.
+- No roadmap item constitutes a claim of vendor equivalence, regulatory
+  compliance, live market access, or certified network connectivity.

@@ -21,7 +21,7 @@ revenue sides needed to balance journal entries.
 
 ### Available balance
 
-The amount the customer may currently spend. In this lab there are no holds or
+The amount the customer may currently spend. In the foundation there are no holds or
 pending settlements, so available and booked balance may initially be the same.
 Do not silently add overdraft behavior.
 
@@ -121,7 +121,7 @@ strategy.
 2. Every journal contains at least two entries.
 3. Within each currency, total debit equals total credit.
 4. Values in different currencies are never summed to test balance.
-5. A transfer and all its C2 journal entries commit or roll back together.
+5. A transfer and all its foundation journal entries commit or roll back together.
 6. Each journal can be traced to one business operation.
 
 ### Concurrency invariants
@@ -150,8 +150,8 @@ request accepted -> BOOKED
 BOOKED -> REVERSED       (later milestone only)
 ```
 
-Invalid requests do not become successful transfer records. In C3, model
-message delivery separately:
+Invalid requests do not become successful transfer records. Message delivery is
+modeled separately:
 
 ```text
 PENDING -> SENT
@@ -159,12 +159,12 @@ PENDING -> RETRYABLE_FAILURE -> PENDING
 ```
 
 Do not add states merely because a real bank might have them. Add a state only
-when the lab has behavior, an allowed transition, and a test for it.
+when the project has behavior, an allowed transition, and a test for it.
 
-## Resolved C0 decisions
+## Foundation decisions
 
 The open modeling questions are resolved in
-[C0 Design Decisions](DESIGN_DECISIONS.md). That record is normative for account
+[Foundation Design Decisions](DESIGN_DECISIONS.md). That record is normative for account
 signs, ledger truth versus stored balances, precision and rounding, quote use and
 expiry, idempotency, locking, HTTP errors, reversal, authentication, and rate
 trust. Change one of those assumptions through an ADR rather than silently

@@ -1,4 +1,4 @@
 /**
- * Immutable journals and per-currency balanced debit and credit entries.
+ * FX subledger journals, per-currency balanced entries, and reconciliation evidence.
  */
 package dev.kavrin.fxtransfer.ledger;
