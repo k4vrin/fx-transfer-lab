@@ -41,13 +41,37 @@ public class Money {
     }
 
     public Money add(Money money) {
-        Objects.requireNonNull(money, "money");
-
-        if (!currency.equals(money.currency())) {
-            throw new IllegalArgumentException("currency mismatch");
-        }
+        requireSameCurrency(money);
 
         return Money.of(this.amount.add(money.amount), money.currency);
+    }
+
+    public Money subtract(Money money) {
+        requireSameCurrency(money);
+
+        return Money.of(this.amount.subtract(money.amount), money.currency);
+    }
+
+    public int compareTo(Money money) {
+        requireSameCurrency(money);
+
+        return this.amount.compareTo(money.amount);
+    }
+
+    public boolean isZero() {
+        return this.amount.signum() == 0;
+    }
+
+    public boolean isPositive() {
+        return this.amount.signum() == 1;
+    }
+
+    private void requireSameCurrency(Money money) {
+        Objects.requireNonNull(money, "money");
+
+        if (!currency.equals(money.currency)) {
+            throw new IllegalArgumentException("currency mismatch");
+        }
     }
 
     @Override
