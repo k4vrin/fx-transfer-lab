@@ -13,12 +13,12 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>FX Transfer Lab</name>
 	<description>Reference implementation of an idempotent internal FX transfer and subledger</description>
-	<url>https://github.com/CodeBase-WorkSpace/fx-transfer-lab</url>
+	<url>https://github.com/k4vrin/fx-transfer-lab</url>
 	<scm>
-		<connection>scm:git:https://github.com/CodeBase-WorkSpace/fx-transfer-lab.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/CodeBase-WorkSpace/fx-transfer-lab.git</developerConnection>
+		<connection>scm:git:https://github.com/k4vrin/fx-transfer-lab.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/k4vrin/fx-transfer-lab.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/CodeBase-WorkSpace/fx-transfer-lab</url>
+		<url>https://github.com/k4vrin/fx-transfer-lab</url>
 	</scm>
 	<properties>
 		<java.version>21</java.version>
