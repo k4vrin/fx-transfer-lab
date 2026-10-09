@@ -2,9 +2,16 @@
 
 This roadmap describes how FX Transfer Lab can evolve from one reliable internal
 FX transfer into an enterprise-shaped foreign-exchange and trade-finance
-platform. The direction is inspired by publicly described capabilities common
-to products such as Exir, but this project is independent and is not affiliated
-with, endorsed by, or a reproduction of any vendor product.
+platform. [Wise's public quote documentation](https://docs.wise.com/guides/product/send-money/quotes/authenticated-quote)
+provides a reference for quote-to-transfer behavior.
+[TOSAN Exir's public product description](https://tosan.com/products/index/67?title=%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87+%D8%A7%D8%B1%D8%B2%DB%8C+%D8%A7%DA%A9%D8%B3%DB%8C%D8%B1)
+provides a reference for broader FX and trade-finance capabilities. These inform
+different parts of the roadmap; neither establishes the vendors' private
+architecture. This project is independent and is not affiliated with, endorsed
+by, or a reproduction of Wise, Exir, or any other vendor product.
+
+See [quote and ledger architecture](QUOTE_AND_LEDGER_ARCHITECTURE.md) for the
+comparison and [numbered ADRs](adr/README.md) for the project's own decisions.
 
 The roadmap has no delivery-date promise. A phase advances only when its
 correctness, security, operational, and migration gates are satisfied.
@@ -14,6 +21,12 @@ correctness, security, operational, and migration gates are satisfied.
 The foundation starts as a modular monolith with one Oracle database because a
 single local transaction is the clearest way to establish monetary, ledger,
 idempotency, and concurrency correctness.
+
+[ADR-0001](adr/0001-java-spring-modular-monolith.md) records the process and
+module boundary; [ADR-0002](adr/0002-internal-book-transfer-foundation.md) records
+the internal-transfer scope. Each phase must keep accepted design separate from
+implemented and verified behavior. A change to an accepted boundary requires
+a new ADR and corresponding contract, code, and test updates.
 
 The intended long-term boundary is different:
 

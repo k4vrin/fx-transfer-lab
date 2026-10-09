@@ -10,6 +10,11 @@ value between two internally maintained accounts using an expiring quote. The
 long-term roadmap evolves that foundation toward an enterprise-shaped FX and
 trade-finance platform connected to a separate synthetic core-banking system.
 
+Public references include [Wise's quote-to-transfer contract](https://docs.wise.com/guides/product/send-money/quotes/authenticated-quote)
+and [TOSAN Exir's FX and trade-finance product scope](https://tosan.com/products/index/67?title=%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87+%D8%A7%D8%B1%D8%B2%DB%8C+%D8%A7%DA%A9%D8%B3%DB%8C%D8%B1).
+See the [architecture comparison](docs/QUOTE_AND_LEDGER_ARCHITECTURE.md) for how
+each reference relates to this project's scope and decisions.
+
 > [!IMPORTANT]
 > This project is independent and is not affiliated with or endorsed by any bank,
 > network, regulator, or software vendor. It does not claim SWIFT or SEPAM
@@ -58,13 +63,22 @@ anti-corruption layer. See the [product roadmap](docs/ROADMAP.md).
 - [x] English and Persian product and domain documentation
 - [x] Foundation design decisions and package boundaries
 - [x] Enterprise FX and trade-finance roadmap
-- [ ] Money, rates, fees, and quotes
+- [x] Immutable money, directed rates, fee policies, and quote snapshots
 - [ ] Oracle schema and persistence adapters
 - [ ] JWT resource-server security
 - [ ] Idempotent transfer booking and FX subledger
 - [ ] Transactional outbox and operational diagnostics
 
-No transfer endpoint or financial domain implementation is claimed yet.
+The monetary domain has portable unit-test coverage. The first customer/account
+migration includes schema constraints and has been applied in the Oracle
+integration lane. Oracle tests cover customer/account, quote, transfer, and idempotency
+constraints, valid rows, decimal storage, timestamp precision, and quote-use
+uniqueness including reuse after rolling back a transfer insert. Idempotency tests
+cover caller-scoped uniqueness, fingerprint format, reservation/result shapes,
+JSON response storage, and rollback of a reservation and transfer together.
+Transfer endpoints,
+the remaining schema, database booking, and coordinated
+concurrency tests remain pending.
 
 ## Technology
 
@@ -77,23 +91,39 @@ No transfer endpoint or financial domain implementation is claimed yet.
 
 ## Documentation
 
+- [Numbered architecture decision records](docs/adr/README.md): rationale, alternatives, consequences, and implementation evidence
 - Product requirements: [English](docs/PRD.md) · [فارسی](docs/PRD.fa.md)
 - Domain model and invariants: [English](docs/DOMAIN_MODEL.md) · [فارسی](docs/DOMAIN_MODEL.fa.md)
 - Foundation design decisions: [English](docs/DESIGN_DECISIONS.md) · [فارسی](docs/DESIGN_DECISIONS.fa.md)
+- Quote and ledger architecture, alternatives, and company comparisons: [English](docs/QUOTE_AND_LEDGER_ARCHITECTURE.md) · [فارسی](docs/QUOTE_AND_LEDGER_ARCHITECTURE.fa.md)
 - [Package responsibilities](docs/PACKAGE_GUIDE.md)
 - Enterprise FX and trade-finance roadmap: [English](docs/ROADMAP.md) · [فارسی](docs/ROADMAP.fa.md)
 
 ## Run the checks
 
-Activate the repository's Java version and run verification:
+Activate the repository's Java version:
 
 ```shell
 sdk env
-./mvnw verify
 ```
 
-Oracle integration tests use Testcontainers, so Docker must be running. The
-first run downloads the configured Oracle image and can take several minutes.
+Run the portable unit tests without Docker:
+
+```shell
+./mvnw test
+```
+
+Run the portable tests and Oracle integration tests with Docker running:
+
+```shell
+./mvnw verify -Poracle-it
+```
+
+Surefire runs the portable tests; the `oracle-it` profile binds Failsafe's
+`integration-test` and `verify` goals for classes named `*IT`. Without that
+profile, `./mvnw verify` does not run the Oracle tests. An unavailable Docker
+engine or Oracle container fails the integration lane rather than skipping it.
+The first Oracle run downloads the pinned image and can take several minutes.
 
 ## Run locally
 

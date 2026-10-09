@@ -13,6 +13,11 @@ transactions, idempotency, concurrency-safe booking, double-entry accounting
 evidence, and reliable message handoff. It is independent and does not reproduce
 or claim equivalence with any vendor or bank system.
 
+Wise and TOSAN Exir are public comparison references, not required integrations.
+Their different roles are explained in
+[quote and ledger architecture](QUOTE_AND_LEDGER_ARCHITECTURE.md) and the
+[product roadmap](ROADMAP.md). Requirements here are this project's contract.
+
 ## 2. The business problem in plain language
 
 Suppose a customer owns a EUR account and a USD account. They want to spend EUR
@@ -72,8 +77,13 @@ The exact foundation choices for precision, quote use, expiry, idempotency,
 locking, authentication, reversal, and rate trust are normative in
 [Foundation Design Decisions](DESIGN_DECISIONS.md).
 
-Any changed assumption must be captured in a short architecture decision record
-before code and tests are changed.
+The rationale is recorded in the [numbered ADRs](adr/README.md), especially
+[internal-transfer scope](adr/0002-internal-book-transfer-foundation.md),
+[account types](adr/0003-three-account-types.md), and
+[atomic booking](adr/0009-atomic-booking-and-lock-order.md).
+Any changed assumption must be captured in a new numbered ADR before code and
+tests are changed. Update this contract and the affected documentation together;
+an accepted requirement does not imply its implementation is complete.
 
 ## 5. Functional requirements
 

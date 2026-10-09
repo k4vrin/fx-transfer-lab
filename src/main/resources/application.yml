@@ -11,14 +11,13 @@ spring:
           time_zone: UTC
   flyway:
     enabled: true
+  web:
+    error:
+      include-message: never
+      include-stacktrace: never
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
-
-server:
-  error:
-    include-message: never
-    include-stacktrace: never

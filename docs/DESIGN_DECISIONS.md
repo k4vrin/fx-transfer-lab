@@ -3,8 +3,16 @@
 [نسخه فارسی](DESIGN_DECISIONS.fa.md)
 
 These decisions define the first useful version of FX Transfer Lab. They are
-project assumptions, not claims about Exir, SWIFT, central-bank rules, or a
+project assumptions, not claims about Wise, TOSAN Exir, SWIFT, central-bank rules, or a
 particular core-banking product.
+
+[Numbered architecture decision records](adr/README.md) explain the rationale,
+alternatives, consequences, and current implementation of these choices. The
+section numbers below are independent of ADR IDs.
+
+For rationale, alternatives, diagrams, and evidence-based comparisons with Wise,
+Currencycloud, Modern Treasury, and TOSAN Exir, see
+[Quote and ledger architecture](QUOTE_AND_LEDGER_ARCHITECTURE.md).
 
 ## Decision summary
 

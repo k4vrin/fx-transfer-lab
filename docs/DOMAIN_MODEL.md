@@ -167,5 +167,9 @@ The open modeling questions are resolved in
 [Foundation Design Decisions](DESIGN_DECISIONS.md). That record is normative for account
 signs, ledger truth versus stored balances, precision and rounding, quote use and
 expiry, idempotency, locking, HTTP errors, reversal, authentication, and rate
-trust. Change one of those assumptions through an ADR rather than silently
-changing code.
+trust. The [numbered ADRs](adr/README.md) explain the reasons and alternatives.
+[ADR-0003](adr/0003-three-account-types.md) distinguishes three account types
+from the five account rows in the example;
+[ADR-0007](adr/0007-ledger-authority-and-balance-projection.md) explains opening
+balance, booked balance, and reconciliation. Change an accepted assumption
+through a new ADR and update these invariants with the code and tests.

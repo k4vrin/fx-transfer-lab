@@ -4,6 +4,10 @@ The root package is `dev.kavrin.fxtransfer`. Organize primarily by business
 capability, then introduce `api`, `application`, `domain`, and `infrastructure`
 inside a capability only when those distinctions are useful.
 
+[ADR-0001](adr/0001-java-spring-modular-monolith.md) explains this module and
+framework boundary. The [ADR index](adr/README.md) distinguishes accepted design
+from implemented behavior; a package listed here may still be only a scaffold.
+
 ```text
 dev.kavrin.fxtransfer
 ├── account
@@ -100,3 +104,9 @@ keep it with that capability.
 
 The first implementation may keep a feature flat. Add subpackages when there
 are enough classes to clarify rather than obscure responsibility.
+
+Use [ADR-0006](adr/0006-fee-strategies-and-policy-keys.md) for fee selection,
+[ADR-0009](adr/0009-atomic-booking-and-lock-order.md) for the application booking
+boundary, and [ADR-0012](adr/0012-outbox-and-external-system-boundary.md) for
+delivery and later external-system ownership. Vendor API models belong behind
+adapters; comparison references do not change these dependency rules.
