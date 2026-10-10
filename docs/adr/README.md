@@ -21,7 +21,7 @@ not an implemented distributed transaction design.
 | [0004](0004-immutable-expiring-quote.md) | Immutable quote and trusted rate snapshot | Domain and quote schema tested; provider and persistence adapter pending |
 | [0005](0005-decimal-money-and-rounding.md) | Decimal money, directed rates, and explicit rounding | Implemented in domain values and fee calculation |
 | [0006](0006-fee-strategies-and-policy-keys.md) | Fee strategies selected through normalized keys | Domain registry implemented; configuration wiring pending |
-| [0007](0007-ledger-authority-and-balance-projection.md) | Immutable ledger with a synchronous balance projection | Balance columns exist; ledger and reconciliation pending |
+| [0007](0007-ledger-authority-and-balance-projection.md) | Immutable ledger with a synchronous balance projection | Balance columns and journal/entry schema tested; posting and reconciliation pending |
 | [0008](0008-oracle-flyway-and-test-lanes.md) | Oracle, Flyway, and separate test lanes | Configuration, initial migration, and context integration test |
 | [0009](0009-atomic-booking-and-lock-order.md) | Atomic booking and deterministic locking | Planned |
 | [0010](0010-successful-command-idempotency.md) | Caller-scoped idempotency for committed successes | Schema tested; booking coordination and replay pending |

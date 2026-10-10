@@ -56,8 +56,13 @@ verify uniqueness and reuse after a savepoint rollback. That is database-level
 evidence, not an application booking or coordinated-race test.
 [Idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/IdempotencySchemaIT.java)
 also roll back a reservation, transfer, and successful result together and then
-reuse the same key. Journal and outbox tables and the booking service remain
-pending; this test does not establish atomicity of all financial writes.
+reuse the same key. The [journal header tests](../../src/test/java/dev/kavrin/fxtransfer/JournalSchemaIT.java)
+cover V5's unique transfer linkage, deletion protection, and rollback of a
+transfer and its journal header together.
+[Journal-entry tests](../../src/test/java/dev/kavrin/fxtransfer/JournalEntrySchemaIT.java)
+cover V6's row constraints and rollback of a header and entries together.
+Outbox and the booking service remain pending; these tests do not establish atomicity of all
+financial writes or balanced accounting.
 
 Verify with coordinated Oracle races and failure injection after each financial
 write. Revisit locking after measuring contention, or when final balances move

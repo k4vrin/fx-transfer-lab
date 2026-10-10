@@ -76,7 +76,12 @@ constraints, valid rows, decimal storage, timestamp precision, and quote-use
 uniqueness including reuse after rolling back a transfer insert. Idempotency tests
 cover caller-scoped uniqueness, fingerprint format, reservation/result shapes,
 JSON response storage, and rollback of a reservation and transfer together.
-Transfer endpoints,
+Journal-header tests cover required fields, one journal per transfer, deletion
+protection, timestamp precision, and transfer/journal rollback. Journal-entry tests
+cover positive amounts, direction, account/currency matching, deletion protection,
+decimal storage, and journal/entry rollback. A boundary test demonstrates that
+minimum entry count and whole-journal balance are not enforced by row constraints.
+Balanced posting remains pending. Transfer endpoints,
 the remaining schema, database booking, and coordinated
 concurrency tests remain pending.
 
@@ -143,6 +148,29 @@ docker compose down
 ```
 
 Add `--volumes` only when intentionally discarding the local database.
+
+### Synthetic local starting data
+
+The `local` profile adds `classpath:db/local` to Flyway's migration locations.
+Its repeatable seed creates one fictional customer and five accounts. Default
+profiles apply only the schema migrations and do not load this data.
+
+Customer ID: `10000000-0000-0000-0000-000000000001`. Account IDs share the
+prefix `20000000-0000-0000-0000-` and use these suffixes:
+
+| Account ID suffix | Account type | Currency | Opening and initial booked balance |
+| --- | --- | --- | ---: |
+| `000000000001` | CUSTOMER_LIABILITY | EUR | 1,000.00 |
+| `000000000002` | CUSTOMER_LIABILITY | USD | 0.00 |
+| `000000000003` | FX_CLEARING_ASSET | EUR | 0.00 |
+| `000000000004` | FX_CLEARING_ASSET | USD | 10,000.00 |
+| `000000000005` | FEE_REVENUE | EUR | 0.00 |
+
+The seed inserts missing rows only. Re-execution never resets an existing
+balance. Flyway runs repeatable migrations initially and when their checksum
+changes; this is not a reset on every startup. Quotes, transfers, journals,
+entries, and idempotency outcomes start empty. Deterministic rate-provider
+wiring and application booking are still pending.
 
 ## Scope boundaries
 
