@@ -56,7 +56,7 @@ See [balance columns](../../src/main/resources/db/migration/V1__create_customers
 Current columns alone do not prove journal or reconciliation correctness.
 The [journal-entry migration](../../src/main/resources/db/migration/V6__create_journal_entries.sql)
 enforces positive amounts, debit/credit direction, and account/currency matching.
-[Oracle tests](../../src/test/java/dev/kavrin/fxtransfer/JournalEntrySchemaIT.java)
+[Oracle tests](../../src/test/java/dev/kavrin/fxtransfer/ledger/infrastructure/JournalEntrySchemaIT.java)
 verify these constraints, deletion protection, decimal storage, and rollback.
 They also demonstrate that the schema accepts a single entry or an unbalanced
 pair. Minimum entry count and balance per currency require booking validation.

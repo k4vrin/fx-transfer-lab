@@ -55,7 +55,7 @@ and [failure caching contract](../DESIGN_DECISIONS.md#7-failure-caching).
 No current domain unit test establishes concurrent command deduplication.
 
 [V4](../../src/main/resources/db/migration/V4__create_idempotency_records.sql)
-and the [idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/IdempotencySchemaIT.java)
+and the [idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/IdempotencySchemaIT.java)
 establish scope uniqueness, lowercase 64-character hexadecimal fingerprint
 format, reservation and successful-result shapes, strict JSON response storage,
 and rollback of the reservation and transfer together, followed by same-key reuse.

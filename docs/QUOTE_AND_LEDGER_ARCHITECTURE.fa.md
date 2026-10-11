@@ -61,7 +61,7 @@
 
 ## ۳. مظنه فعلی چه می‌کند و چه چیزهایی هنوز برنامه هستند؟
 
-[Quote پیاده‌سازی‌شده](../src/main/java/dev/kavrin/fxtransfer/quote/Quote.java)
+[Quote پیاده‌سازی‌شده](../src/main/java/dev/kavrin/fxtransfer/quote/domain/Quote.java)
 مبلغ مبدأ، مبلغ مقصد، کارمزد محاسبه‌شده، `RateSnapshot`، زمان ایجاد و زمان انقضا
 را نگه می‌دارد. factory مبلغ مقصد و کارمزد را فقط یک بار محاسبه می‌کند.
 متد `isExpired(now)` در حالت `now >= expiresAt` مقدار true می‌دهد.

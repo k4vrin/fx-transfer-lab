@@ -40,17 +40,22 @@ The first release is a modular monolith with one Oracle database:
 ```text
 dev.kavrin.fxtransfer
 ├── account     # account identity, ownership and initial balance projection
-├── fee         # fee policies and selection
-├── quote       # rates, quote creation, snapshots and expiry
+├── fee
+│   └── domain  # fee policies and selection
+├── quote
+│   ├── domain  # rates, quote creation, snapshots and expiry
+│   └── application.port  # trusted rate-provider contract
 ├── transfer    # use cases, lifecycle, authorization and idempotency
 ├── ledger      # FX subledger, journals and reconciliation
 ├── outbox      # durable outbound messages and retry state
-└── shared      # carefully selected shared value types
+└── shared.domain  # carefully selected shared value types
 ```
 
 The domain remains independent from HTTP, JSON, JPA, and remote client models.
 Application services coordinate transactions and ports; infrastructure adapters
 own persistence and external protocols.
+See the [package guide](docs/PACKAGE_GUIDE.md) for current class locations,
+test organization, and placement of future adapters.
 
 The target architecture keeps the FX subledger but moves authoritative customer
 accounts, balances, reservations, and final postings behind a core-banking

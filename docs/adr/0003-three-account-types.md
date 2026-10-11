@@ -57,7 +57,7 @@ nonnegative constraint. Clearing rows may become shared contention points.
 See [account migration](../../src/main/resources/db/migration/V1__create_customers_and_accounts.sql)
 and [account sign contract](../DESIGN_DECISIONS.md#1-account-types-and-debitcredit-effects).
 The migration contains type, ownership, currency, and customer-balance checks;
-the [account schema tests](../../src/test/java/dev/kavrin/fxtransfer/AccountSchemaIT.java)
+the [account schema tests](../../src/test/java/dev/kavrin/fxtransfer/account/infrastructure/AccountSchemaIT.java)
 cover accepted rows and constraint rejection on Oracle. The posting engine
 remains pending.
 

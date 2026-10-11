@@ -48,18 +48,18 @@ those policies as separate requirements. An expired offer requires a new quote.
 
 ## Evidence and revisit conditions
 
-See [Quote](../../src/main/java/dev/kavrin/fxtransfer/quote/Quote.java),
-[RateSnapshot](../../src/main/java/dev/kavrin/fxtransfer/quote/RateSnapshot.java),
-[Quote tests](../../src/test/java/dev/kavrin/fxtransfer/quote/QuoteTest.java), and
+See [Quote](../../src/main/java/dev/kavrin/fxtransfer/quote/domain/Quote.java),
+[RateSnapshot](../../src/main/java/dev/kavrin/fxtransfer/quote/domain/RateSnapshot.java),
+[Quote tests](../../src/test/java/dev/kavrin/fxtransfer/quote/domain/QuoteTest.java), and
 [architecture explanation](../QUOTE_AND_LEDGER_ARCHITECTURE.md).
 The current `Quote` has no persistent ID, owner, consumption state, or funds reservation.
 
 The [V2 quote table](../../src/main/resources/db/migration/V2__create_quotes.sql)
 adds quote identity, required customer ownership, frozen amounts and provenance,
-and timestamp columns. [Quote schema tests](../../src/test/java/dev/kavrin/fxtransfer/QuoteSchemaIT.java)
+and timestamp columns. [Quote schema tests](../../src/test/java/dev/kavrin/fxtransfer/quote/infrastructure/QuoteSchemaIT.java)
 verify its constraints, decimal storage, and nanosecond instant precision on
 Oracle. [V3](../../src/main/resources/db/migration/V3__create_transfers.sql)
-adds unique transfer quote use. [Transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/TransferSchemaIT.java)
+adds unique transfer quote use. [Transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/TransferSchemaIT.java)
 verify rejection of a second transfer for the same quote and reuse after a
 transfer insert is rolled back to a savepoint. Java persistence mapping and
 coordinated concurrent-booking tests are still pending.

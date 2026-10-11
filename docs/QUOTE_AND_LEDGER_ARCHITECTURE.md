@@ -66,7 +66,7 @@ reviewed for this document, not retrospective proof of its origin.
 
 ## 3. What the current quote does, and what is still planned
 
-The implemented [Quote](../src/main/java/dev/kavrin/fxtransfer/quote/Quote.java)
+The implemented [Quote](../src/main/java/dev/kavrin/fxtransfer/quote/domain/Quote.java)
 stores source amount, destination amount, calculated fee, `RateSnapshot`,
 creation instant, and expiry instant. Its factory calculates the destination
 amount and fee once. `isExpired(now)` is true when `now >= expiresAt`.

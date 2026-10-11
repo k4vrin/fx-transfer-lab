@@ -51,15 +51,15 @@ See [transaction contract](../DESIGN_DECISIONS.md#8-transaction-and-lock-order),
 [atomicity requirements](../PRD.md), and [outbox boundary](0012-outbox-and-external-system-boundary.md).
 [V3](../../src/main/resources/db/migration/V3__create_transfers.sql) now includes
 the transfer table and unique quote-use constraint.
-[Transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/TransferSchemaIT.java)
+[Transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/TransferSchemaIT.java)
 verify uniqueness and reuse after a savepoint rollback. That is database-level
 evidence, not an application booking or coordinated-race test.
-[Idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/IdempotencySchemaIT.java)
+[Idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/IdempotencySchemaIT.java)
 also roll back a reservation, transfer, and successful result together and then
-reuse the same key. The [journal header tests](../../src/test/java/dev/kavrin/fxtransfer/JournalSchemaIT.java)
+reuse the same key. The [journal header tests](../../src/test/java/dev/kavrin/fxtransfer/ledger/infrastructure/JournalSchemaIT.java)
 cover V5's unique transfer linkage, deletion protection, and rollback of a
 transfer and its journal header together.
-[Journal-entry tests](../../src/test/java/dev/kavrin/fxtransfer/JournalEntrySchemaIT.java)
+[Journal-entry tests](../../src/test/java/dev/kavrin/fxtransfer/ledger/infrastructure/JournalEntrySchemaIT.java)
 cover V6's row constraints and rollback of a header and entries together.
 Outbox and the booking service remain pending; these tests do not establish atomicity of all
 financial writes or balanced accounting.

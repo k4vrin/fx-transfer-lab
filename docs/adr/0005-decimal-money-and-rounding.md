@@ -44,11 +44,11 @@ domain's rejection of excess fractional precision. SQL insertion can round.
 
 ## Evidence and revisit conditions
 
-See [Money](../../src/main/java/dev/kavrin/fxtransfer/shared/Money.java),
-[DirectedExchangeRate](../../src/main/java/dev/kavrin/fxtransfer/quote/DirectedExchangeRate.java),
-[percentage calculation](../../src/main/java/dev/kavrin/fxtransfer/fee/PercentageFeePolicy.java),
-and their [money tests](../../src/test/java/dev/kavrin/fxtransfer/shared/MoneyTest.java)
-and [rate tests](../../src/test/java/dev/kavrin/fxtransfer/quote/DirectedExchangeRateTest.java).
+See [Money](../../src/main/java/dev/kavrin/fxtransfer/shared/domain/Money.java),
+[DirectedExchangeRate](../../src/main/java/dev/kavrin/fxtransfer/quote/domain/DirectedExchangeRate.java),
+[percentage calculation](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/PercentageFeePolicy.java),
+and their [money tests](../../src/test/java/dev/kavrin/fxtransfer/shared/domain/MoneyTest.java)
+and [rate tests](../../src/test/java/dev/kavrin/fxtransfer/quote/domain/DirectedExchangeRateTest.java).
 
 Revisit scale, maximum representable amount, rounding, and equality together when
 adding currencies, different settlement units, or product-specific rounding.

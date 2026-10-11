@@ -1,5 +1,7 @@
 package dev.kavrin.fxtransfer;
 
+import dev.kavrin.fxtransfer.support.TestcontainersConfiguration;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

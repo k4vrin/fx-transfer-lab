@@ -45,19 +45,19 @@ overspending race, deadlock path, or rollback scenario.
 
 See [Maven test profile](../../pom.xml), [Compose configuration](../../compose.yaml),
 [initial migration](../../src/main/resources/db/migration/V1__create_customers_and_accounts.sql),
-[Oracle test configuration](../../src/test/java/dev/kavrin/fxtransfer/TestcontainersConfiguration.java),
+[Oracle test configuration](../../src/test/java/dev/kavrin/fxtransfer/support/TestcontainersConfiguration.java),
 and [context integration test](../../src/test/java/dev/kavrin/fxtransfer/FxTransferLabApplicationIT.java).
-The [account schema tests](../../src/test/java/dev/kavrin/fxtransfer/AccountSchemaIT.java)
+The [account schema tests](../../src/test/java/dev/kavrin/fxtransfer/account/infrastructure/AccountSchemaIT.java)
 now cover customer/account constraints, accepted ownership shapes, and balance
 storage. Coordinated concurrency tests and constraints for the remaining
 financial tables are still pending. The
-[quote schema tests](../../src/test/java/dev/kavrin/fxtransfer/QuoteSchemaIT.java)
+[quote schema tests](../../src/test/java/dev/kavrin/fxtransfer/quote/infrastructure/QuoteSchemaIT.java)
 also cover quote ownership, monetary and rate bounds, provenance, expiry, and
 nanosecond timestamp storage after V2 migration.
-The [transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/TransferSchemaIT.java)
+The [transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/TransferSchemaIT.java)
 cover V3 foreign keys, required values, synchronous status, snapshot storage,
 unique quote use, and quote reuse after rollback of an insert.
-The [idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/IdempotencySchemaIT.java)
+The [idempotency schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/IdempotencySchemaIT.java)
 cover V4 scope uniqueness, fingerprint format, result states, strict JSON and
 large response snapshots, timestamp precision, and reservation/transfer rollback.
 

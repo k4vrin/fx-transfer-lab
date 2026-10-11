@@ -45,8 +45,14 @@ must keep domain dependencies separate from adapters.
 ## Evidence and revisit conditions
 
 See [Maven configuration](../../pom.xml), [package responsibilities](../PACKAGE_GUIDE.md),
-and [Money](../../src/main/java/dev/kavrin/fxtransfer/shared/Money.java).
+and [Money](../../src/main/java/dev/kavrin/fxtransfer/shared/domain/Money.java).
 The current domain classes have no Spring or persistence annotations.
+Domain values and fee strategies now live under capability-specific `domain`
+packages; `RateProvider` lives in `quote.application.port`. Tests mirror these
+packages, with schema tests in the owning capability's infrastructure and shared
+Oracle configuration in test-only `support`. These moves implement the existing
+capability-first decision; application booking and persistence adapters remain
+pending.
 
 Revisit service boundaries when a specific ownership, deployment, security,
 availability, or measured scaling requirement justifies a separate commit boundary.

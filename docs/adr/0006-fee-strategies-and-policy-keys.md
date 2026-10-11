@@ -46,12 +46,12 @@ not change an issued offer.
 
 ## Evidence and revisit conditions
 
-See [FeePolicy](../../src/main/java/dev/kavrin/fxtransfer/fee/FeePolicy.java),
-[FeePolicyKey](../../src/main/java/dev/kavrin/fxtransfer/fee/FeePolicyKey.java),
-[registry](../../src/main/java/dev/kavrin/fxtransfer/fee/FeePolicyRegistry.java),
-[fixed fee](../../src/main/java/dev/kavrin/fxtransfer/fee/FixedFeePolicy.java),
-[percentage fee](../../src/main/java/dev/kavrin/fxtransfer/fee/PercentageFeePolicy.java),
-and [registry tests](../../src/test/java/dev/kavrin/fxtransfer/fee/FeePolicyRegistryTest.java).
+See [FeePolicy](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/FeePolicy.java),
+[FeePolicyKey](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/FeePolicyKey.java),
+[registry](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/FeePolicyRegistry.java),
+[fixed fee](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/FixedFeePolicy.java),
+[percentage fee](../../src/main/java/dev/kavrin/fxtransfer/fee/domain/PercentageFeePolicy.java),
+and [registry tests](../../src/test/java/dev/kavrin/fxtransfer/fee/domain/FeePolicyRegistryTest.java).
 
 Revisit for effective-dated pricing, activation approval, concurrent reload,
 policy provenance, or a product requirement that changes the percentage bounds.
