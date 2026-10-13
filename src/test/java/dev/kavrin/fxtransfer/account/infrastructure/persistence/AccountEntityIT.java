@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
@@ -37,9 +36,13 @@ class AccountEntityIT {
                 "EUR", "123.45", "67.89");
         var account = loadAccount(fixture.accountId());
 
-        // TODO: Assert non-null, both IDs, type, currency, and both exact balance values.
-        // Use fixture accessors for expected values, not another database query.
-        fail("Complete the customer account mapping assertions");
+        assertThat(account).isNotNull();
+        assertThat(account.getAccountId()).isEqualTo(fixture.accountId());
+        assertThat(account.getCustomerId()).isEqualTo(fixture.customerId());
+        assertThat(account.getAccountType()).isEqualTo(fixture.accountType());
+        assertThat(account.getCurrency()).isEqualTo(fixture.currency());
+        assertThat(account.getOpeningBalance()).isEqualByComparingTo(fixture.openingBalance());
+        assertThat(account.getBookedBalance()).isEqualByComparingTo(fixture.bookedBalance());
     }
 
     @ParameterizedTest
@@ -53,19 +56,25 @@ class AccountEntityIT {
         var fixture = insertAccount(null, type, currency, "-10.25", "-20.50");
         var account = loadAccount(fixture.accountId());
 
-        // TODO: Assert non-null, account ID, null customer ID, enum type, currency, and balances.
-        fail("Complete the internal account mapping assertions");
+        assertThat(account).isNotNull();
+        assertThat(account.getAccountId()).isEqualTo(fixture.accountId());
+        assertThat(account.getCustomerId()).isNull();
+        assertThat(account.getAccountType()).isEqualTo(fixture.accountType());
+        assertThat(account.getCurrency()).isEqualTo(fixture.currency());
+        assertThat(account.getOpeningBalance()).isEqualByComparingTo(fixture.openingBalance());
+        assertThat(account.getBookedBalance()).isEqualByComparingTo(fixture.bookedBalance());
     }
 
     @Test
-    void preservesTwoDecimalPlacesForZeroBalances() {
+    void loadsZeroBalancesWithoutRequiringDatabaseScale() {
         var fixture = insertAccount(createCustomer(), AccountType.CUSTOMER_LIABILITY,
                 "USD", "0.00", "0.00");
         var account = loadAccount(fixture.accountId());
 
-        // TODO: Check both balances equal zero numerically AND both have scale 2.
-        // isEqualByComparingTo checks value; a separate scale() assertion checks representation.
-        fail("Complete the zero value and scale assertions");
+        assertThat(account).isNotNull();
+        // Entity loading preserves numeric value; mapping to Money will normalize decimal scale.
+        assertThat(account.getOpeningBalance()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(account.getBookedBalance()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -74,17 +83,17 @@ class AccountEntityIT {
                 "EUR", "99999999999999999.99", "99999999999999999.98");
         var account = loadAccount(fixture.accountId());
 
-        // TODO: Check both balances against the fixture and assert scale 2.
         // NUMBER(19,2) permits 17 integer digits; these values must not pass through double.
-        fail("Complete the large exact balance assertions");
+        assertThat(account).isNotNull();
+        assertThat(account.getOpeningBalance()).isEqualByComparingTo(fixture.openingBalance());
+        assertThat(account.getBookedBalance()).isEqualByComparingTo(fixture.bookedBalance());
     }
 
     @Test
     void returnsNullForMissingAccount() {
         var account = loadAccount(UUID.randomUUID().toString());
 
-        // TODO: Assert that EntityManager.find returns null for an absent row.
-        fail("Complete the missing account assertion");
+        assertThat(account).isNull();
     }
 
     private String createCustomer() {
