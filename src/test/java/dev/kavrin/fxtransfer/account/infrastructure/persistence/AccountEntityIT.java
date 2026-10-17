@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
@@ -94,6 +95,91 @@ class AccountEntityIT {
         var account = loadAccount(UUID.randomUUID().toString());
 
         assertThat(account).isNull();
+    }
+
+    @Test
+    void persistsAndReloadsCustomerAccount() {
+        var accountId = UUID.randomUUID().toString();
+        var customerId = createCustomer();
+
+        var account = new AccountEntity(
+                accountId,
+                customerId,
+                AccountType.CUSTOMER_LIABILITY,
+                "EUR",
+                new BigDecimal("123.45"),
+                new BigDecimal("67.89")
+        );
+
+        entityManager.persist(account);
+        entityManager.flush();
+        entityManager.clear();
+
+        var reloaded = entityManager.find(
+                AccountEntity.class,
+                accountId
+        );
+
+        assertThat(reloaded).isNotNull();
+        assertThat(reloaded.getAccountId()).isEqualTo(account.getAccountId());
+        assertThat(reloaded.getCustomerId())
+                .isEqualTo(customerId);
+        assertThat(reloaded.getAccountType()).isEqualTo(account.getAccountType());
+        assertThat(reloaded.getCurrency()).isEqualTo(account.getCurrency());
+        assertThat(reloaded.getOpeningBalance()).isEqualByComparingTo(account.getOpeningBalance());
+        assertThat(reloaded.getBookedBalance()).isEqualByComparingTo(account.getBookedBalance());
+    }
+
+    @Test
+    void persistsAndReloadsInternalAccount() {
+        var accountId = UUID.randomUUID().toString();
+
+        var account = new AccountEntity(
+                accountId,
+                null,
+                AccountType.FX_CLEARING_ASSET,
+                "USD",
+                new BigDecimal("-10.25"),
+                new BigDecimal("-20.50")
+        );
+
+        entityManager.persist(account);
+        entityManager.flush();
+        entityManager.clear();
+
+        var reloaded = entityManager.find(
+                AccountEntity.class,
+                accountId
+        );
+
+        assertThat(reloaded).isNotNull();
+        assertThat(reloaded.getAccountId()).isEqualTo(account.getAccountId());
+        assertThat(reloaded.getCustomerId()).isNull();
+        assertThat(reloaded.getAccountType()).isEqualTo(account.getAccountType());
+        assertThat(reloaded.getCurrency()).isEqualTo(account.getCurrency());
+        assertThat(reloaded.getOpeningBalance()).isEqualByComparingTo(account.getOpeningBalance());
+        assertThat(reloaded.getBookedBalance()).isEqualByComparingTo(account.getBookedBalance());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0.00, -0.01",
+            "-0.01, 0.00"
+    })
+    void rejectsNegativeCustomerBalance(String opening, String booked) {
+        var account = new AccountEntity(
+                UUID.randomUUID().toString(),
+                createCustomer(),
+                AccountType.CUSTOMER_LIABILITY,
+                "EUR",
+                new BigDecimal(opening),
+                new BigDecimal(booked)
+        );
+
+        assertThatThrownBy(() -> {
+            entityManager.persist(account);
+            entityManager.flush();
+        }).hasStackTraceContaining("CK_CUSTOMER_BALANCE");
     }
 
     private String createCustomer() {

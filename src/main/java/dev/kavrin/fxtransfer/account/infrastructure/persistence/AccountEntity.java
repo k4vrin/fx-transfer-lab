@@ -4,7 +4,6 @@ import dev.kavrin.fxtransfer.account.domain.AccountType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Table(name = "account")
@@ -42,6 +41,22 @@ public class AccountEntity {
 
     protected AccountEntity() {
         // Required by JPA when reconstructing an entity from a database row.
+    }
+
+    public AccountEntity(
+            String accountId,
+            String customerId,
+            AccountType accountType,
+            String currency,
+            BigDecimal openingBalance,
+            BigDecimal bookedBalance
+    ) {
+        this.accountId = accountId;
+        this.customerId = customerId;
+        this.accountType = accountType;
+        this.currency = currency;
+        this.openingBalance = openingBalance;
+        this.bookedBalance = bookedBalance;
     }
 
     public String getCurrency() {

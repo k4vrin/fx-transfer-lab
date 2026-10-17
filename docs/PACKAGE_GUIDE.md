@@ -19,7 +19,10 @@ dev.kavrin.fxtransfer
 │       └── port               # RateProvider
 ├── shared
 │   └── domain                 # Money
-├── account                    # capability scaffold
+├── account
+│   ├── domain                 # Account, AccountType
+│   └── infrastructure
+│       └── persistence        # AccountEntity, AccountEntityMapper
 ├── transfer                   # capability scaffold
 ├── ledger                     # capability scaffold
 └── outbox                     # capability scaffold
@@ -56,6 +59,13 @@ should not absorb all domain rules.
 Owns customer and internal ledger-account identity, currency, ownership, and
 spendable-balance rules. Persistence locking needed for a debit also belongs to
 this capability's infrastructure.
+
+`Account` is immutable and owns balance currency, ownership, and customer
+nonnegative-balance validation. Its manual builder delegates to the same validated
+constructor. `AccountEntity` maps Oracle rows; `AccountEntityMapper` converts row
+values to domain values through `Money.of`. Mapper behavior tests are currently
+explicitly disabled learning scaffolds, not completed verification. Repository
+adapters, booking locks, and reconciliation remain pending.
 
 It must not decide exchange rates, fees, or HTTP responses.
 
