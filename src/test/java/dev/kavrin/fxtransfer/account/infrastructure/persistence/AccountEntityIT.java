@@ -7,6 +7,7 @@ import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -180,6 +182,53 @@ class AccountEntityIT {
             entityManager.persist(account);
             entityManager.flush();
         }).hasStackTraceContaining("CK_CUSTOMER_BALANCE");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"EUR", "USD"})
+    void mapsLoadedCustomerAccountWithNormalizedZeroBalances(String currency) {
+        var fixture = insertAccount(createCustomer(), AccountType.CUSTOMER_LIABILITY,
+                currency, "0.00", "0.00");
+        var entity = loadAccount(fixture.accountId());
+        assertThat(entity).isNotNull();
+
+        var account = AccountEntityMapper.toDomain(entity);
+
+        assertThat(account.accountId()).isEqualTo(fixture.accountId());
+        assertThat(account.customerId()).isEqualTo(fixture.customerId());
+        assertThat(account.accountType()).isEqualTo(AccountType.CUSTOMER_LIABILITY);
+        assertThat(account.openingBalance().amount()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(account.bookedBalance().amount()).isEqualByComparingTo(BigDecimal.ZERO);
+        // Assert the domain representation, independently of Oracle's returned decimal scale.
+        assertThat(account.openingBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.bookedBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.openingBalance().currency()).isEqualTo(Currency.getInstance(currency));
+        assertThat(account.bookedBalance().currency()).isEqualTo(Currency.getInstance(currency));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "FX_CLEARING_ASSET, EUR",
+            "FX_CLEARING_ASSET, USD",
+            "FEE_REVENUE, EUR",
+            "FEE_REVENUE, USD"
+    })
+    void mapsLoadedInternalAccountWithSignedBalances(AccountType type, String currency) {
+        var fixture = insertAccount(null, type, currency, "-10.25", "-20.50");
+        var entity = loadAccount(fixture.accountId());
+        assertThat(entity).isNotNull();
+
+        var account = AccountEntityMapper.toDomain(entity);
+
+        assertThat(account.accountId()).isEqualTo(fixture.accountId());
+        assertThat(account.customerId()).isNull();
+        assertThat(account.accountType()).isEqualTo(type);
+        assertThat(account.openingBalance().amount()).isEqualByComparingTo(fixture.openingBalance());
+        assertThat(account.bookedBalance().amount()).isEqualByComparingTo(fixture.bookedBalance());
+        assertThat(account.openingBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.bookedBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.openingBalance().currency()).isEqualTo(Currency.getInstance(currency));
+        assertThat(account.bookedBalance().currency()).isEqualTo(Currency.getInstance(currency));
     }
 
     private String createCustomer() {

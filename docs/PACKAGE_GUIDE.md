@@ -63,9 +63,10 @@ this capability's infrastructure.
 `Account` is immutable and owns balance currency, ownership, and customer
 nonnegative-balance validation. Its manual builder delegates to the same validated
 constructor. `AccountEntity` maps Oracle rows; `AccountEntityMapper` converts row
-values to domain values through `Money.of`. Mapper behavior tests are currently
-explicitly disabled learning scaffolds, not completed verification. Repository
-adapters, booking locks, and reconciliation remain pending.
+values to domain values through `Money.of`. Portable mapper tests cover field
+preservation, scale normalization, and rejection of invalid state. Oracle account
+tests also exercise SQL-to-JPA-to-domain mapping for customer and internal rows.
+Repository adapters, booking locks, and reconciliation remain pending.
 
 It must not decide exchange rates, fees, or HTTP responses.
 

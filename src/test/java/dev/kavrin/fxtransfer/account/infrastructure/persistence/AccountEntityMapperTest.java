@@ -1,7 +1,6 @@
 package dev.kavrin.fxtransfer.account.infrastructure.persistence;
 
 import dev.kavrin.fxtransfer.account.domain.AccountType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -9,12 +8,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-// Implement every TODO, then remove @Disabled and verify this class as a batch.
-// Each unfinished test fails explicitly if enabled before its assertions are written.
-@Disabled("Learning scaffold: mapper assertions are not implemented yet")
 class AccountEntityMapperTest {
 
     @Test
@@ -24,8 +22,12 @@ class AccountEntityMapperTest {
 
         var account = AccountEntityMapper.toDomain(entity);
 
-        // TODO Assert both amounts are numeric zero, both scales are 2, and both currencies are EUR.
-        fail("Implement zero balance normalization assertions");
+        assertThat(account.openingBalance().amount()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(account.bookedBalance().amount()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(account.openingBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.bookedBalance().amount().scale()).isEqualTo(2);
+        assertThat(account.openingBalance().currency()).isEqualTo(Currency.getInstance("EUR"));
+        assertThat(account.bookedBalance().currency()).isEqualTo(Currency.getInstance("EUR"));
     }
 
     @ParameterizedTest
@@ -36,8 +38,13 @@ class AccountEntityMapperTest {
 
         var account = AccountEntityMapper.toDomain(entity);
 
-        // TODO Assert account ID, customer ID, type, both distinct amounts, and both currencies.
-        fail("Implement customer field preservation assertions");
+        assertThat(account.accountId()).isEqualTo("account-1");
+        assertThat(account.customerId()).isEqualTo("customer-1");
+        assertThat(account.accountType()).isEqualTo(AccountType.CUSTOMER_LIABILITY);
+        assertThat(account.openingBalance().amount()).isEqualByComparingTo("123.45");
+        assertThat(account.bookedBalance().amount()).isEqualByComparingTo("67.89");
+        assertThat(account.openingBalance().currency()).isEqualTo(Currency.getInstance(currency));
+        assertThat(account.bookedBalance().currency()).isEqualTo(Currency.getInstance(currency));
     }
 
     @ParameterizedTest
@@ -53,14 +60,20 @@ class AccountEntityMapperTest {
 
         var account = AccountEntityMapper.toDomain(entity);
 
-        // TODO Assert identity, null owner, type, both negative amounts, and both currencies.
-        fail("Implement internal account preservation assertions");
+        assertThat(account.accountId()).isEqualTo("account-1");
+        assertThat(account.customerId()).isNull();
+        assertThat(account.accountType()).isEqualTo(type);
+        assertThat(account.openingBalance().amount()).isEqualByComparingTo("-10.25");
+        assertThat(account.bookedBalance().amount()).isEqualByComparingTo("-20.50");
+        assertThat(account.openingBalance().currency()).isEqualTo(Currency.getInstance(currency));
+        assertThat(account.bookedBalance().currency()).isEqualTo(Currency.getInstance(currency));
     }
 
     @Test
     void rejectsNullEntity() {
-        // TODO Wrap toDomain(null) in assertThatThrownBy; expect NullPointerException naming entity.
-        fail("Implement null entity rejection assertion");
+        assertThatThrownBy(() -> AccountEntityMapper.toDomain(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("entity");
     }
 
     @Test
@@ -68,8 +81,9 @@ class AccountEntityMapperTest {
         var entity = entity("customer-1", AccountType.CUSTOMER_LIABILITY,
                 "JPY", BigDecimal.ZERO, BigDecimal.ZERO);
 
-        // TODO Assert mapping throws IllegalArgumentException through Money's supported-currency rule.
-        fail("Implement unsupported currency rejection assertion");
+        assertThatThrownBy(() -> AccountEntityMapper.toDomain(entity))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("currency is not supported");
     }
 
     @ParameterizedTest
@@ -78,8 +92,8 @@ class AccountEntityMapperTest {
         var entity = entity("customer-1", AccountType.CUSTOMER_LIABILITY,
                 "EUR", new BigDecimal(opening), new BigDecimal(booked));
 
-        // TODO Assert mapping throws ArithmeticException instead of silently rounding either balance.
-        fail("Implement excess precision rejection assertion");
+        assertThatThrownBy(() -> AccountEntityMapper.toDomain(entity))
+                .isInstanceOf(ArithmeticException.class);
     }
 
     @ParameterizedTest
@@ -88,8 +102,9 @@ class AccountEntityMapperTest {
         var entity = entity("customer-1", AccountType.CUSTOMER_LIABILITY,
                 "EUR", new BigDecimal(opening), new BigDecimal(booked));
 
-        // TODO Assert mapping rejects the invalid customer state through Account's constructor.
-        fail("Implement negative customer balance rejection assertion");
+        assertThatThrownBy(() -> AccountEntityMapper.toDomain(entity))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("customer account balances must not be negative");
     }
 
     @ParameterizedTest
@@ -98,8 +113,12 @@ class AccountEntityMapperTest {
         var owner = type == AccountType.CUSTOMER_LIABILITY ? null : "customer-1";
         var entity = entity(owner, type, "EUR", BigDecimal.ZERO, BigDecimal.ZERO);
 
-        // TODO Assert mapping throws IllegalArgumentException for the invalid ownership shape.
-        fail("Implement invalid ownership rejection assertion");
+        var expectedMessage = type == AccountType.CUSTOMER_LIABILITY
+                ? "customer accounts must have a customerId"
+                : "internal accounts must not have a customerId";
+        assertThatThrownBy(() -> AccountEntityMapper.toDomain(entity))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 
     private static AccountEntity entity(
