@@ -18,7 +18,7 @@ not an implemented distributed transaction design.
 | [0001](0001-java-spring-modular-monolith.md) | Java 21, Spring Boot, and a modular monolith | Scaffold and independent monetary domain |
 | [0002](0002-internal-book-transfer-foundation.md) | Begin with an internal book transfer | Product scope; booking pending |
 | [0003](0003-three-account-types.md) | Three account types and balancing per currency | Account migration; posting engine pending |
-| [0004](0004-immutable-expiring-quote.md) | Immutable quote and trusted rate snapshot | Domain and quote schema tested; provider and persistence adapter pending |
+| [0004](0004-immutable-expiring-quote.md) | Immutable quote and trusted rate snapshot | Domain, configured provider, schema and JPA snapshot mapping tested; repository adapter pending |
 | [0005](0005-decimal-money-and-rounding.md) | Decimal money, directed rates, and explicit rounding | Implemented in domain values and fee calculation |
 | [0006](0006-fee-strategies-and-policy-keys.md) | Fee strategies selected through normalized keys | Domain registry implemented; configuration wiring pending |
 | [0007](0007-ledger-authority-and-balance-projection.md) | Immutable ledger with a synchronous balance projection | Balance columns and journal/entry schema tested; posting and reconciliation pending |

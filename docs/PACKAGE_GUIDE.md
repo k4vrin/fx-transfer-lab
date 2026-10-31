@@ -20,9 +20,10 @@ dev.kavrin.fxtransfer
 ├── shared
 │   └── domain                 # Money
 ├── account
+│   ├── application            # AccountRepository port
 │   ├── domain                 # Account, AccountType
 │   └── infrastructure
-│       └── persistence        # AccountEntity, AccountEntityMapper
+│       └── persistence        # entity, mapper, Spring Data repository and adapter
 ├── transfer                   # capability scaffold
 ├── ledger                     # capability scaffold
 └── outbox                     # capability scaffold
@@ -34,8 +35,8 @@ capability's `infrastructure` package. Local seed integration tests live in
 `integration.database`, and shared Oracle setup lives in test-only `support`.
 
 Create `api`, `application`, and `infrastructure` packages as their code arrives.
-The next configured-rate implementation belongs in `quote.infrastructure.rate`;
-Spring wiring belongs in `quote.infrastructure.configuration`. JPA mappings
+The configured-rate implementation lives in `quote.infrastructure.rate`;
+local Spring wiring lives in `quote.infrastructure.configuration`. JPA mappings
 will belong in each capability's `infrastructure.persistence` package.
 
 ## Dependency direction
@@ -66,7 +67,12 @@ constructor. `AccountEntity` maps Oracle rows; `AccountEntityMapper` converts ro
 values to domain values through `Money.of`. Portable mapper tests cover field
 preservation, scale normalization, and rejection of invalid state. Oracle account
 tests also exercise SQL-to-JPA-to-domain mapping for customer and internal rows.
-Repository adapters, booking locks, and reconciliation remain pending.
+`AccountRepository` exposes domain account lookup through an application port.
+`AccountPersistenceAdapter` delegates to the package-private Spring Data repository
+and maps present rows to domain values. Portable tests cover found/missing lookup
+and propagation of repository or mapping failures. Oracle integration tests
+exercise the injected application port with independent SQL fixtures.
+Other persistence adapters, booking locks, and reconciliation remain pending.
 
 It must not decide exchange rates, fees, or HTTP responses.
 
@@ -89,6 +95,15 @@ infrastructure adapter implements that contract without making the domain
 depend on configuration files, Spring, or a remote client.
 
 It must not book balances or publish messages.
+
+`quote.infrastructure.persistence` maps the saved snapshot using `QuoteEntity`
+and `QuoteEntityMapper`. Quote identity and customer ownership remain persistence
+metadata; the monetary domain stays independent of JPA. `Quote.restore` validates
+historical amounts, rate direction, fee currency, and expiry ordering without
+consulting a clock, rate provider, or fee policy. Expired snapshots remain loadable.
+The mapper preserves stored values and rejects inconsistent destination amounts
+instead of replacing them with a newly calculated amount. A repository port,
+adapter, API orchestration, and booking locks are still pending.
 
 ## `transfer`
 

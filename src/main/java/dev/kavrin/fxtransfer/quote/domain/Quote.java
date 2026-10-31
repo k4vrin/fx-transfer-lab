@@ -69,6 +69,39 @@ public final class Quote {
         );
     }
 
+    /** Restores historical values without consulting a clock, provider, or fee policy. */
+    public static Quote restore(
+            Money sourceAmount,
+            Money destinationAmount,
+            Money fee,
+            RateSnapshot rateSnapshot,
+            Instant createdAt,
+            Instant expiresAt
+    ) {
+        Objects.requireNonNull(sourceAmount, "sourceAmount");
+        Objects.requireNonNull(destinationAmount, "destinationAmount");
+        Objects.requireNonNull(fee, "fee");
+        Objects.requireNonNull(rateSnapshot, "rateSnapshot");
+        Objects.requireNonNull(createdAt, "createdAt");
+        Objects.requireNonNull(expiresAt, "expiresAt");
+        if (!sourceAmount.isPositive()) {
+            throw new IllegalArgumentException("source amount must be positive");
+        }
+        if (!fee.currency().equals(sourceAmount.currency())) {
+            throw new IllegalArgumentException("fee currency must match source amount currency");
+        }
+        if (fee.amount().signum() < 0) {
+            throw new IllegalArgumentException("fee must be non-negative");
+        }
+        if (!destinationAmount.equals(rateSnapshot.rate().convert(sourceAmount))) {
+            throw new IllegalArgumentException("destination amount must match the stored rate conversion");
+        }
+        if (!expiresAt.isAfter(createdAt)) {
+            throw new IllegalArgumentException("expiry must be after creation");
+        }
+        return new Quote(sourceAmount, destinationAmount, fee, rateSnapshot, createdAt, expiresAt);
+    }
+
     public RateSnapshot rateSnapshot() {
         return rateSnapshot;
     }

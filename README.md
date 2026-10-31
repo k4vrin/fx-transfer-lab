@@ -90,6 +90,18 @@ Balanced posting remains pending. Transfer endpoints,
 the remaining schema, database booking, and coordinated
 concurrency tests remain pending.
 
+Account persistence includes a domain model, JPA entity and mapper, application
+repository port, and Spring Data adapter. Adapter tests cover found and missing
+accounts and error propagation; Oracle tests exercise customer and internal-account
+lookup through the application port. Other capability mappings, booking locks,
+and reconciliation remain pending.
+
+Quote persistence now includes a JPA entity and bidirectional snapshot mapper.
+Oracle round-trip tests check monetary values, rate provenance, and nanosecond
+instants in both currency directions. Restoring a historical quote preserves
+its saved fee and timestamps and rejects inconsistent monetary state. Quote
+repository orchestration and booking remain pending.
+
 ## Technology
 
 - Java 21
@@ -174,8 +186,9 @@ prefix `20000000-0000-0000-0000-` and use these suffixes:
 The seed inserts missing rows only. Re-execution never resets an existing
 balance. Flyway runs repeatable migrations initially and when their checksum
 changes; this is not a reset on every startup. Quotes, transfers, journals,
-entries, and idempotency outcomes start empty. Deterministic rate-provider
-wiring and application booking are still pending.
+entries, and idempotency outcomes start empty. The local profile wires a configured
+rate provider with explicit EUR-to-USD and USD-to-EUR fixture snapshots.
+Application booking remains pending.
 
 ## Scope boundaries
 

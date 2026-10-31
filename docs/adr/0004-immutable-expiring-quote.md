@@ -2,7 +2,7 @@
 
 - Status: Accepted
 - Recorded: 2026-10-09, retrospective
-- Implementation: Domain and quote schema tested; rate provider and persistence adapter pending
+- Implementation: Domain, configured rate provider, quote schema and JPA snapshot mapping tested; repository adapter pending
 
 ## Context
 
@@ -61,8 +61,14 @@ verify its constraints, decimal storage, and nanosecond instant precision on
 Oracle. [V3](../../src/main/resources/db/migration/V3__create_transfers.sql)
 adds unique transfer quote use. [Transfer schema tests](../../src/test/java/dev/kavrin/fxtransfer/transfer/infrastructure/TransferSchemaIT.java)
 verify rejection of a second transfer for the same quote and reuse after a
-transfer insert is rolled back to a savepoint. Java persistence mapping and
-coordinated concurrent-booking tests are still pending.
+transfer insert is rolled back to a savepoint.
+[QuoteEntity](../../src/main/java/dev/kavrin/fxtransfer/quote/infrastructure/persistence/QuoteEntity.java)
+and its mapper preserve the historical snapshot. `Quote.restore` checks the
+snapshot's internal consistency without repricing or rejecting it merely because
+it has expired. [Oracle mapping tests](../../src/test/java/dev/kavrin/fxtransfer/quote/infrastructure/persistence/QuoteEntityIT.java)
+verify independent SQL reads, flushed JPA write/read round trips, nanosecond
+instants, and rejection of destination amounts inconsistent with the saved rate.
+The quote repository adapter and coordinated concurrent-booking tests remain pending.
 Storage limits for rate magnitude and provenance length must be
 handled at the persistence boundary.
 

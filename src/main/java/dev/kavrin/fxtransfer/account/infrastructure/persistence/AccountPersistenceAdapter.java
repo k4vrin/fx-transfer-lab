@@ -2,10 +2,8 @@ package dev.kavrin.fxtransfer.account.infrastructure.persistence;
 
 import dev.kavrin.fxtransfer.account.application.AccountRepository;
 import dev.kavrin.fxtransfer.account.domain.Account;
-import dev.kavrin.fxtransfer.shared.domain.Money;
 import org.springframework.stereotype.Repository;
 
-import java.util.Currency;
 import java.util.Optional;
 
 @Repository
